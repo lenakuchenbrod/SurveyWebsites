@@ -1,0 +1,1004 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Umfrage - Deine Meinung zählt</title>
+
+    <!-- EmailJS SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+
+    <style>
+        /* === RESET & BASE === */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            /* Waldgrün/Olivgrün Farbpalette */
+            --primary: #556B2F;
+            --primary-dark: #3d4f21;
+            --primary-light: #6d8a3a;
+            --accent: #8B7355;
+            --background: #F5F7F4;
+            --surface: #FFFFFF;
+            --text-primary: #2C3E1F;
+            --text-secondary: #5A6B4F;
+            --border: #D4DDD0;
+            --error: #D64545;
+            --success: #4A7C59;
+            --overlay: rgba(0, 0, 0, 0.5);
+
+            /* Spacing */
+            --spacing-xs: 0.5rem;
+            --spacing-sm: 1rem;
+            --spacing-md: 1.5rem;
+            --spacing-lg: 2rem;
+            --spacing-xl: 3rem;
+
+            /* Typography */
+            --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            --font-size-sm: 0.875rem;
+            --font-size-base: 1rem;
+            --font-size-lg: 1.125rem;
+            --font-size-xl: 1.5rem;
+            --font-size-2xl: 2rem;
+
+            /* Border Radius */
+            --radius-sm: 0.375rem;
+            --radius-md: 0.5rem;
+            --radius-lg: 1rem;
+
+            /* Shadows */
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07);
+            --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            font-family: var(--font-family);
+            background: var(--background);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* === LAYOUT === */
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: var(--spacing-md);
+        }
+
+        /* === HEADER === */
+        .header {
+            text-align: center;
+            padding: var(--spacing-xl) 0;
+        }
+
+        .welcome-message {
+            font-size: var(--font-size-xl);
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: var(--spacing-lg);
+            line-height: 1.3;
+        }
+
+        /* === PROGRESS BAR === */
+        .progress-container {
+            position: sticky;
+            top: 0;
+            background: var(--surface);
+            padding: var(--spacing-md);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+            margin-bottom: var(--spacing-lg);
+            z-index: 100;
+        }
+
+        .progress-text {
+            font-size: var(--font-size-sm);
+            color: var(--text-secondary);
+            margin-bottom: var(--spacing-xs);
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .progress-bar-bg {
+            width: 100%;
+            height: 8px;
+            background: var(--border);
+            border-radius: 999px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--primary-light));
+            border-radius: 999px;
+            transition: width 0.3s ease;
+        }
+
+        /* === FORM === */
+        .survey-form {
+            background: var(--surface);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-xl);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .form-section {
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .section-title {
+            font-size: var(--font-size-lg);
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: var(--spacing-md);
+            padding-bottom: var(--spacing-sm);
+            border-bottom: 2px solid var(--border);
+        }
+
+        /* === FORM FIELDS === */
+        .form-group {
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: var(--spacing-sm);
+            font-size: var(--font-size-base);
+        }
+
+        .form-label.required::after {
+            content: " *";
+            color: var(--error);
+        }
+
+        .form-input,
+        .form-textarea {
+            width: 100%;
+            padding: var(--spacing-sm) var(--spacing-md);
+            border: 2px solid var(--border);
+            border-radius: var(--radius-md);
+            font-family: var(--font-family);
+            font-size: var(--font-size-base);
+            color: var(--text-primary);
+            transition: all 0.2s ease;
+            background: var(--surface);
+        }
+
+        .form-input:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(85, 107, 47, 0.1);
+        }
+
+        .form-input.error,
+        .form-textarea.error {
+            border-color: var(--error);
+        }
+
+        .form-textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .error-message {
+            display: none;
+            color: var(--error);
+            font-size: var(--font-size-sm);
+            margin-top: var(--spacing-xs);
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        /* === SLIDER === */
+        .slider-container {
+            padding: var(--spacing-md) 0;
+        }
+
+        .slider-value-display {
+            text-align: center;
+            margin-bottom: var(--spacing-md);
+        }
+
+        .slider-value {
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--primary);
+            line-height: 1;
+        }
+
+        .slider-wrapper {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+        }
+
+        .slider-label {
+            font-size: var(--font-size-sm);
+            color: var(--text-secondary);
+            white-space: nowrap;
+            min-width: 80px;
+        }
+
+        .slider-label.min {
+            text-align: right;
+        }
+
+        .slider-label.max {
+            text-align: left;
+        }
+
+        .slider-input {
+            flex: 1;
+            -webkit-appearance: none;
+            appearance: none;
+            height: 12px;
+            background: var(--border);
+            border-radius: 999px;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .slider-input::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 28px;
+            height: 28px;
+            background: var(--primary);
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: var(--shadow-md);
+            transition: all 0.2s ease;
+        }
+
+        .slider-input::-moz-range-thumb {
+            width: 28px;
+            height: 28px;
+            background: var(--primary);
+            border-radius: 50%;
+            cursor: pointer;
+            border: none;
+            box-shadow: var(--shadow-md);
+            transition: all 0.2s ease;
+        }
+
+        .slider-input:hover::-webkit-slider-thumb {
+            transform: scale(1.1);
+            background: var(--primary-dark);
+        }
+
+        .slider-input:hover::-moz-range-thumb {
+            transform: scale(1.1);
+            background: var(--primary-dark);
+        }
+
+        .slider-input::-webkit-slider-runnable-track {
+            height: 12px;
+            background: linear-gradient(
+                to right,
+                var(--primary) 0%,
+                var(--primary) var(--slider-value, 50%),
+                var(--border) var(--slider-value, 50%),
+                var(--border) 100%
+            );
+            border-radius: 999px;
+        }
+
+        .slider-input::-moz-range-track {
+            height: 12px;
+            background: var(--border);
+            border-radius: 999px;
+        }
+
+        .slider-input::-moz-range-progress {
+            height: 12px;
+            background: var(--primary);
+            border-radius: 999px;
+        }
+
+        /* === BUTTONS === */
+        .submit-button {
+            width: 100%;
+            padding: var(--spacing-md) var(--spacing-xl);
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: var(--radius-md);
+            font-size: var(--font-size-lg);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: var(--shadow-md);
+            margin-top: var(--spacing-lg);
+        }
+
+        .submit-button:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .submit-button:active {
+            transform: translateY(0);
+        }
+
+        .submit-button:disabled {
+            background: var(--text-secondary);
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .retry-button {
+            width: 100%;
+            padding: var(--spacing-md) var(--spacing-xl);
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: var(--radius-md);
+            font-size: var(--font-size-lg);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: var(--shadow-md);
+            margin-top: var(--spacing-md);
+        }
+
+        .retry-button:hover {
+            background: #7a6349;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        /* === LOADING STATE === */
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--overlay);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .loading-overlay.show {
+            display: flex;
+        }
+
+        .loading-content {
+            background: var(--surface);
+            padding: var(--spacing-xl);
+            border-radius: var(--radius-lg);
+            text-align: center;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid var(--border);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto var(--spacing-md);
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            font-size: var(--font-size-lg);
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        /* === SUCCESS/ERROR MESSAGES === */
+        .message-container {
+            display: none;
+            background: var(--surface);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-xl);
+            box-shadow: var(--shadow-lg);
+            text-align: center;
+        }
+
+        .message-container.show {
+            display: block;
+        }
+
+        .success-icon,
+        .error-icon {
+            font-size: 4rem;
+            margin-bottom: var(--spacing-md);
+        }
+
+        .success-icon {
+            color: var(--success);
+        }
+
+        .error-icon {
+            color: var(--error);
+        }
+
+        .success-title,
+        .error-title {
+            font-size: var(--font-size-2xl);
+            font-weight: 600;
+            margin-bottom: var(--spacing-md);
+        }
+
+        .success-title {
+            color: var(--success);
+        }
+
+        .error-title {
+            color: var(--error);
+        }
+
+        .success-message,
+        .error-description {
+            font-size: var(--font-size-lg);
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* === CONFETTI === */
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background-color: var(--primary);
+            position: absolute;
+            animation: confetti-fall 3s linear forwards;
+        }
+
+        @keyframes confetti-fall {
+            to {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        /* === RESPONSIVE === */
+        @media (max-width: 768px) {
+            :root {
+                --spacing-xl: 2rem;
+                --spacing-lg: 1.5rem;
+                --font-size-2xl: 1.5rem;
+                --font-size-xl: 1.25rem;
+            }
+
+            .container {
+                padding: var(--spacing-sm);
+            }
+
+            .survey-form {
+                padding: var(--spacing-md);
+            }
+
+            .slider-wrapper {
+                flex-direction: column;
+                gap: var(--spacing-sm);
+            }
+
+            .slider-label {
+                text-align: center !important;
+                min-width: auto;
+            }
+
+            .slider-value {
+                font-size: 2.5rem;
+            }
+
+            .progress-container {
+                margin-bottom: var(--spacing-md);
+            }
+        }
+
+        /* === ANIMATIONS === */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* === UTILITIES === */
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1 class="welcome-message" id="welcomeMessage">Lädt...</h1>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="progress-container" id="progressContainer">
+            <div class="progress-text" id="progressText">Fortschritt: 0%</div>
+            <div class="progress-bar-bg">
+                <div class="progress-bar-fill" id="progressBar" style="width: 0%"></div>
+            </div>
+        </div>
+
+        <!-- Loading Overlay -->
+        <div class="loading-overlay" id="loadingOverlay">
+            <div class="loading-content">
+                <div class="spinner"></div>
+                <div class="loading-text">Wird gesendet...</div>
+            </div>
+        </div>
+
+        <!-- Survey Form -->
+        <form class="survey-form fade-in" id="surveyForm">
+            <!-- Contact Section -->
+            <div class="form-section">
+                <h2 class="section-title">Kontaktinformationen</h2>
+
+                <div class="form-group">
+                    <label class="form-label required" for="name">Dein Name</label>
+                    <input
+                        type="text"
+                        id="name"
+                        class="form-input"
+                        placeholder="Max Mustermann"
+                        required
+                    >
+                    <div class="error-message" id="nameError">Bitte gib deinen Namen ein (mindestens 2 Zeichen)</div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label required" for="email">Deine E-Mail-Adresse</label>
+                    <input
+                        type="email"
+                        id="email"
+                        class="form-input"
+                        placeholder="max@beispiel.de"
+                        required
+                    >
+                    <div class="error-message" id="emailError">Bitte gib eine gültige E-Mail-Adresse ein</div>
+                </div>
+            </div>
+
+            <!-- Questions Section -->
+            <div class="form-section">
+                <h2 class="section-title">Fragen</h2>
+                <div id="questionsContainer">
+                    <!-- Questions will be dynamically inserted here -->
+                </div>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" class="submit-button">Umfrage absenden</button>
+        </form>
+
+        <!-- Success Message -->
+        <div class="message-container" id="successContainer">
+            <div class="success-icon">✅</div>
+            <h2 class="success-title">Erfolgreich gesendet!</h2>
+            <p class="success-message" id="successMessage"></p>
+        </div>
+
+        <!-- Error Message -->
+        <div class="message-container" id="errorContainer">
+            <div class="error-icon">❌</div>
+            <h2 class="error-title">Es gab einen Fehler</h2>
+            <p class="error-description" id="errorDescription">
+                Leider konnte die Umfrage nicht gesendet werden. Bitte versuche es erneut.
+            </p>
+            <button class="retry-button" id="retryButton">Nochmal versuchen</button>
+        </div>
+    </div>
+
+    <script>
+        // Initialize EmailJS
+        (function() {
+            emailjs.init('d-WTYIfsDo-VTTHQX');
+        })();
+
+        // Global variables
+        let surveyData = null;
+        const SURVEY_DATA_URL = 'survey-questions.json';
+
+        // DOM elements
+        const welcomeMessage = document.getElementById('welcomeMessage');
+        const surveyForm = document.getElementById('surveyForm');
+        const questionsContainer = document.getElementById('questionsContainer');
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        const successContainer = document.getElementById('successContainer');
+        const errorContainer = document.getElementById('errorContainer');
+        const successMessage = document.getElementById('successMessage');
+        const errorDescription = document.getElementById('errorDescription');
+        const retryButton = document.getElementById('retryButton');
+        const progressContainer = document.getElementById('progressContainer');
+        const progressText = document.getElementById('progressText');
+        const progressBar = document.getElementById('progressBar');
+
+        // Load survey data
+        async function loadSurveyData() {
+            try {
+                const response = await fetch(SURVEY_DATA_URL);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                surveyData = await response.json();
+                initializeSurvey();
+            } catch (error) {
+                console.error('Fehler beim Laden der Umfrage-Daten:', error);
+                welcomeMessage.textContent = 'Fehler beim Laden der Umfrage';
+                alert('Die Umfrage konnte nicht geladen werden. Bitte lade die Seite neu.');
+            }
+        }
+
+        // Initialize survey
+        function initializeSurvey() {
+            // Set welcome message
+            welcomeMessage.textContent = surveyData.welcome_message;
+            successMessage.textContent = surveyData.success_message;
+
+            // Render questions
+            renderQuestions();
+
+            // Update progress on input
+            updateProgress();
+
+            // Add event listeners for progress tracking
+            const inputs = surveyForm.querySelectorAll('input, textarea');
+            inputs.forEach(input => {
+                input.addEventListener('input', updateProgress);
+                input.addEventListener('change', updateProgress);
+            });
+
+            // Auto-focus first field
+            document.getElementById('name').focus();
+        }
+
+        // Render questions dynamically
+        function renderQuestions() {
+            surveyData.questions.forEach((question, index) => {
+                const questionDiv = document.createElement('div');
+                questionDiv.className = 'form-group';
+
+                const label = document.createElement('label');
+                label.className = 'form-label required';
+                label.setAttribute('for', `question_${question.id}`);
+                label.textContent = `${index + 1}. ${question.question}`;
+                questionDiv.appendChild(label);
+
+                if (question.type === 'slider') {
+                    // Create slider
+                    const sliderContainer = document.createElement('div');
+                    sliderContainer.className = 'slider-container';
+
+                    // Value display
+                    const valueDisplay = document.createElement('div');
+                    valueDisplay.className = 'slider-value-display';
+                    const valueSpan = document.createElement('div');
+                    valueSpan.className = 'slider-value';
+                    valueSpan.id = `value_${question.id}`;
+                    valueSpan.textContent = Math.ceil((question.min + question.max) / 2);
+                    valueDisplay.appendChild(valueSpan);
+                    sliderContainer.appendChild(valueDisplay);
+
+                    // Slider wrapper
+                    const sliderWrapper = document.createElement('div');
+                    sliderWrapper.className = 'slider-wrapper';
+
+                    // Min label
+                    const minLabel = document.createElement('span');
+                    minLabel.className = 'slider-label min';
+                    minLabel.textContent = question.minLabel;
+                    sliderWrapper.appendChild(minLabel);
+
+                    // Slider input
+                    const slider = document.createElement('input');
+                    slider.type = 'range';
+                    slider.id = `question_${question.id}`;
+                    slider.name = `question_${question.id}`;
+                    slider.className = 'slider-input';
+                    slider.min = question.min;
+                    slider.max = question.max;
+                    slider.value = Math.ceil((question.min + question.max) / 2);
+                    slider.required = true;
+
+                    // Update slider value display
+                    slider.addEventListener('input', (e) => {
+                        const value = e.target.value;
+                        valueSpan.textContent = value;
+
+                        // Update slider fill percentage
+                        const percentage = ((value - question.min) / (question.max - question.min)) * 100;
+                        e.target.style.setProperty('--slider-value', `${percentage}%`);
+                    });
+
+                    // Set initial fill
+                    const initialValue = Math.ceil((question.min + question.max) / 2);
+                    const initialPercentage = ((initialValue - question.min) / (question.max - question.min)) * 100;
+                    slider.style.setProperty('--slider-value', `${initialPercentage}%`);
+
+                    sliderWrapper.appendChild(slider);
+
+                    // Max label
+                    const maxLabel = document.createElement('span');
+                    maxLabel.className = 'slider-label max';
+                    maxLabel.textContent = question.maxLabel;
+                    sliderWrapper.appendChild(maxLabel);
+
+                    sliderContainer.appendChild(sliderWrapper);
+                    questionDiv.appendChild(sliderContainer);
+
+                } else if (question.type === 'text') {
+                    // Create textarea
+                    const textarea = document.createElement('textarea');
+                    textarea.id = `question_${question.id}`;
+                    textarea.name = `question_${question.id}`;
+                    textarea.className = 'form-textarea';
+                    textarea.placeholder = 'Deine Antwort hier...';
+                    textarea.required = true;
+                    questionDiv.appendChild(textarea);
+
+                    // Error message
+                    const errorMsg = document.createElement('div');
+                    errorMsg.className = 'error-message';
+                    errorMsg.id = `question_${question.id}_error`;
+                    errorMsg.textContent = 'Bitte beantworte diese Frage';
+                    questionDiv.appendChild(errorMsg);
+                }
+
+                questionsContainer.appendChild(questionDiv);
+            });
+        }
+
+        // Update progress bar
+        function updateProgress() {
+            const totalFields = 2 + surveyData.questions.length; // name + email + questions
+            let filledFields = 0;
+
+            // Check name
+            if (document.getElementById('name').value.trim().length >= 2) {
+                filledFields++;
+            }
+
+            // Check email
+            const emailValue = document.getElementById('email').value.trim();
+            if (emailValue && validateEmail(emailValue)) {
+                filledFields++;
+            }
+
+            // Check questions
+            surveyData.questions.forEach(question => {
+                const field = document.getElementById(`question_${question.id}`);
+                if (question.type === 'slider') {
+                    filledFields++; // Sliders always have a value
+                } else if (field.value.trim()) {
+                    filledFields++;
+                }
+            });
+
+            const percentage = Math.round((filledFields / totalFields) * 100);
+            progressText.textContent = `Fortschritt: ${percentage}%`;
+            progressBar.style.width = `${percentage}%`;
+        }
+
+        // Validate email
+        function validateEmail(email) {
+            const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return re.test(email);
+        }
+
+        // Validate form
+        function validateForm() {
+            let isValid = true;
+
+            // Validate name
+            const nameField = document.getElementById('name');
+            const nameError = document.getElementById('nameError');
+            if (nameField.value.trim().length < 2) {
+                nameField.classList.add('error');
+                nameError.classList.add('show');
+                isValid = false;
+            } else {
+                nameField.classList.remove('error');
+                nameError.classList.remove('show');
+            }
+
+            // Validate email
+            const emailField = document.getElementById('email');
+            const emailError = document.getElementById('emailError');
+            if (!validateEmail(emailField.value.trim())) {
+                emailField.classList.add('error');
+                emailError.classList.add('show');
+                isValid = false;
+            } else {
+                emailField.classList.remove('error');
+                emailError.classList.remove('show');
+            }
+
+            // Validate text questions
+            surveyData.questions.forEach(question => {
+                if (question.type === 'text') {
+                    const field = document.getElementById(`question_${question.id}`);
+                    const errorMsg = document.getElementById(`question_${question.id}_error`);
+                    if (!field.value.trim()) {
+                        field.classList.add('error');
+                        errorMsg.classList.add('show');
+                        isValid = false;
+                    } else {
+                        field.classList.remove('error');
+                        errorMsg.classList.remove('show');
+                    }
+                }
+            });
+
+            return isValid;
+        }
+
+        // Collect form data
+        function collectFormData() {
+            const formData = {
+                name: document.getElementById('name').value.trim(),
+                email: document.getElementById('email').value.trim()
+            };
+
+            surveyData.questions.forEach(question => {
+                const field = document.getElementById(`question_${question.id}`);
+                formData[`question_${question.id}`] = field.value;
+            });
+
+            return formData;
+        }
+
+        // Submit form
+        async function submitForm(formData) {
+            loadingOverlay.classList.add('show');
+
+            try {
+                // Send via EmailJS
+                const response = await emailjs.send(
+                    'service_r1m4mdn',
+                    'template_5ws60u4',
+                    formData
+                );
+
+                console.log('EmailJS Response:', response);
+
+                // Show success
+                loadingOverlay.classList.remove('show');
+                surveyForm.classList.add('hidden');
+                progressContainer.classList.add('hidden');
+                successContainer.classList.add('show');
+
+                // Trigger confetti
+                createConfetti();
+
+            } catch (error) {
+                console.error('EmailJS Error:', error);
+
+                // Show error
+                loadingOverlay.classList.remove('show');
+                surveyForm.classList.add('hidden');
+                progressContainer.classList.add('hidden');
+                errorContainer.classList.add('show');
+
+                // Set error description
+                errorDescription.textContent = `Es gab einen Fehler beim Senden der Umfrage: ${error.text || error.message || 'Unbekannter Fehler'}. Bitte versuche es erneut.`;
+            }
+        }
+
+        // Create confetti animation
+        function createConfetti() {
+            const colors = ['#556B2F', '#6d8a3a', '#8B7355', '#4A7C59', '#D4DDD0'];
+            const confettiCount = 100;
+
+            for (let i = 0; i < confettiCount; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = Math.random() * window.innerWidth + 'px';
+                    confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                    confetti.style.animationDuration = (Math.random() * 2 + 2) + 's';
+                    confetti.style.animationDelay = (Math.random() * 0.5) + 's';
+                    document.body.appendChild(confetti);
+
+                    // Remove confetti after animation
+                    setTimeout(() => confetti.remove(), 5000);
+                }, i * 30);
+            }
+        }
+
+        // Form submit handler
+        surveyForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            if (validateForm()) {
+                const formData = collectFormData();
+                await submitForm(formData);
+            } else {
+                // Scroll to first error
+                const firstError = surveyForm.querySelector('.error');
+                if (firstError) {
+                    firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    firstError.focus();
+                }
+            }
+        });
+
+        // Retry button handler
+        retryButton.addEventListener('click', () => {
+            errorContainer.classList.remove('show');
+            surveyForm.classList.remove('hidden');
+            progressContainer.classList.remove('hidden');
+
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        // Add input event listeners for real-time validation
+        document.addEventListener('DOMContentLoaded', () => {
+            // Name field
+            const nameField = document.getElementById('name');
+            nameField.addEventListener('input', () => {
+                const nameError = document.getElementById('nameError');
+                if (nameField.value.trim().length >= 2) {
+                    nameField.classList.remove('error');
+                    nameError.classList.remove('show');
+                }
+            });
+
+            // Email field
+            const emailField = document.getElementById('email');
+            emailField.addEventListener('input', () => {
+                const emailError = document.getElementById('emailError');
+                if (validateEmail(emailField.value.trim())) {
+                    emailField.classList.remove('error');
+                    emailError.classList.remove('show');
+                }
+            });
+
+            // Enter key navigation
+            const formInputs = Array.from(surveyForm.querySelectorAll('input:not([type="range"]), textarea'));
+            formInputs.forEach((input, index) => {
+                input.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' && !e.shiftKey && input.tagName !== 'TEXTAREA') {
+                        e.preventDefault();
+                        const nextInput = formInputs[index + 1];
+                        if (nextInput) {
+                            nextInput.focus();
+                        }
+                    }
+                });
+            });
+        });
+
+        // Load survey on page load
+        loadSurveyData();
+    </script>
+</body>
+</html>
