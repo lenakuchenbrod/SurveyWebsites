@@ -1,0 +1,111 @@
+{
+  "welcome_message": "Danke, dass du dir die Zeit nimmst, an meiner Umfrage teilzunehmen. 🌺",
+  "success_message": "Die Umfrage wurde erfolgreich abgesendet, vielen Dank für deine Ehrlichkeit! 🌞",
+  "contact_fields": {
+    "name": {
+      "label": "Dein Name",
+      "required": true
+    },
+    "email": {
+      "label": "Deine E-Mail-Adresse",
+      "required": true
+    }
+  },
+  "questions": [
+    {
+      "id": 1,
+      "type": "slider",
+      "question": "Wie zufrieden bist du mit deiner aktuellen Website?",
+      "min": 1,
+      "max": 10,
+      "minLabel": "Sehr schlecht",
+      "maxLabel": "Sehr gut"
+    },
+    {
+      "id": 2,
+      "type": "slider",
+      "question": "Wie einfach ist es für dich, Inhalte auf deiner Website selbst zu ändern?",
+      "min": 1,
+      "max": 10,
+      "minLabel": "Sehr schlecht",
+      "maxLabel": "Sehr gut"
+    },
+    {
+      "id": 3,
+      "type": "slider",
+      "question": "Wie schnell reagiert dein aktueller Website-Support/Entwickler auf Änderungswünsche?",
+      "min": 1,
+      "max": 10,
+      "minLabel": "Sehr schlecht",
+      "maxLabel": "Sehr gut"
+    },
+    {
+      "id": 4,
+      "type": "slider",
+      "question": "Wie wichtig ist dir die Geschwindigkeit bei der Website-Entwicklung/Anpassung?",
+      "min": 1,
+      "max": 10,
+      "minLabel": "Sehr schlecht",
+      "maxLabel": "Sehr gut"
+    },
+    {
+      "id": 5,
+      "type": "slider",
+      "question": "Wie viel Kontrolle hast du über das Design und die Inhalte deiner Website?",
+      "min": 1,
+      "max": 10,
+      "minLabel": "Sehr schlecht",
+      "maxLabel": "Sehr gut"
+    },
+    {
+      "id": 6,
+      "type": "text",
+      "question": "Beschreibe kurz, wie deine aktuelle Website entstanden ist (selbst gebaut, Agentur, Baukasten, etc.)"
+    },
+    {
+      "id": 7,
+      "type": "text",
+      "question": "Was sind die 3 größten Frustrationen mit deiner aktuellen Website?"
+    },
+    {
+      "id": 8,
+      "type": "text",
+      "question": "Welche Änderungen oder Updates liegen schon länger auf deiner To-Do-Liste? Warum wurden sie noch nicht umgesetzt?"
+    },
+    {
+      "id": 9,
+      "type": "text",
+      "question": "Wie viel Zeit verbringst du durchschnittlich pro Monat mit Website-Themen (Updates, Support-Anfragen, etc.)?"
+    },
+    {
+      "id": 10,
+      "type": "text",
+      "question": "Wie viel gibst du aktuell pro Jahr für deine Website aus (Hosting, Wartung, Updates, alles zusammen)?"
+    },
+    {
+      "id": 11,
+      "type": "text",
+      "question": "Wenn jemand deine Website in 2 Wochen statt 2-3 Monaten fertigstellen oder überarbeiten könnte – was wäre das für dich wert?"
+    },
+    {
+      "id": 12,
+      "type": "text",
+      "question": "Was müsste passieren, damit du mit einer neuen Person/Agentur für deine Website arbeiten würdest?"
+    },
+    {
+      "id": 13,
+      "type": "text",
+      "question": "Wer trifft bei dir die Entscheidungen über Website-Investitionen?"
+    },
+    {
+      "id": 14,
+      "type": "text",
+      "question": "Gibt es noch etwas Wichtiges zum Thema Website, das ich nicht gefragt habe?"
+    },
+    {
+      "id": 15,
+      "type": "text",
+      "question": "Darf ich dich für ein kurzes Follow-up-Gespräch (20-30 Min) kontaktieren? Wenn ja, wie erreiche ich dich am besten?"
+    }
+  ]
+}
