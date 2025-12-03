@@ -214,7 +214,7 @@
         }
 
         .slider-value {
-            font-size: 3rem;
+            font-size: 1.5rem;
             font-weight: 700;
             color: var(--primary);
             line-height: 1;
@@ -255,8 +255,8 @@
         .slider-input::-webkit-slider-thumb {
             -webkit-appearance: none;
             appearance: none;
-            width: 28px;
-            height: 28px;
+            width: 20px;
+            height: 20px;
             background: var(--primary);
             border-radius: 50%;
             cursor: pointer;
@@ -265,8 +265,8 @@
         }
 
         .slider-input::-moz-range-thumb {
-            width: 28px;
-            height: 28px;
+            width: 20px;
+            height: 20px;
             background: var(--primary);
             border-radius: 50%;
             cursor: pointer;
@@ -503,7 +503,7 @@
             }
 
             .slider-value {
-                font-size: 2.5rem;
+                font-size: 1.25rem;
             }
 
             .progress-container {
@@ -687,7 +687,8 @@
                 questionDiv.className = 'form-group';
 
                 const label = document.createElement('label');
-                label.className = 'form-label required';
+                // Only slider questions are required
+                label.className = question.type === 'slider' ? 'form-label required' : 'form-label';
                 label.setAttribute('for', `question_${question.id}`);
                 label.textContent = `${index + 1}. ${question.question}`;
                 questionDiv.appendChild(label);
@@ -727,11 +728,13 @@
                     slider.max = question.max;
                     slider.value = Math.ceil((question.min + question.max) / 2);
                     slider.required = true;
+                    slider.dataset.touched = 'false'; // Track if user has interacted
 
                     // Update slider value display
                     slider.addEventListener('input', (e) => {
                         const value = e.target.value;
                         valueSpan.textContent = value;
+                        e.target.dataset.touched = 'true'; // Mark as touched
 
                         // Update slider fill percentage
                         const percentage = ((value - question.min) / (question.max - question.min)) * 100;
@@ -755,21 +758,13 @@
                     questionDiv.appendChild(sliderContainer);
 
                 } else if (question.type === 'text') {
-                    // Create textarea
+                    // Create textarea (not required)
                     const textarea = document.createElement('textarea');
                     textarea.id = `question_${question.id}`;
                     textarea.name = `question_${question.id}`;
                     textarea.className = 'form-textarea';
                     textarea.placeholder = 'Deine Antwort hier...';
-                    textarea.required = true;
                     questionDiv.appendChild(textarea);
-
-                    // Error message
-                    const errorMsg = document.createElement('div');
-                    errorMsg.className = 'error-message';
-                    errorMsg.id = `question_${question.id}_error`;
-                    errorMsg.textContent = 'Bitte beantworte diese Frage';
-                    questionDiv.appendChild(errorMsg);
                 }
 
                 questionsContainer.appendChild(questionDiv);
@@ -778,7 +773,7 @@
 
         // Update progress bar
         function updateProgress() {
-            const totalFields = 2 + surveyData.questions.length; // name + email + questions
+            const totalFields = 2 + surveyData.questions.filter(q => q.type === 'slider').length; // name + email + only required slider questions
             let filledFields = 0;
 
             // Check name
@@ -792,13 +787,14 @@
                 filledFields++;
             }
 
-            // Check questions
+            // Check only slider questions (they are required)
             surveyData.questions.forEach(question => {
-                const field = document.getElementById(`question_${question.id}`);
                 if (question.type === 'slider') {
-                    filledFields++; // Sliders always have a value
-                } else if (field.value.trim()) {
-                    filledFields++;
+                    const field = document.getElementById(`question_${question.id}`);
+                    // Only count if user has interacted with the slider
+                    if (field && field.dataset.touched === 'true') {
+                        filledFields++;
+                    }
                 }
             });
 
@@ -841,21 +837,7 @@
                 emailError.classList.remove('show');
             }
 
-            // Validate text questions
-            surveyData.questions.forEach(question => {
-                if (question.type === 'text') {
-                    const field = document.getElementById(`question_${question.id}`);
-                    const errorMsg = document.getElementById(`question_${question.id}_error`);
-                    if (!field.value.trim()) {
-                        field.classList.add('error');
-                        errorMsg.classList.add('show');
-                        isValid = false;
-                    } else {
-                        field.classList.remove('error');
-                        errorMsg.classList.remove('show');
-                    }
-                }
-            });
+            // Text questions are optional, no validation needed
 
             return isValid;
         }
@@ -912,25 +894,33 @@
             }
         }
 
-        // Create confetti animation
+        // Create confetti animation (runs once)
+        let confettiPlayed = false;
         function createConfetti() {
+            if (confettiPlayed) return; // Prevent multiple runs
+            confettiPlayed = true;
+
             const colors = ['#556B2F', '#6d8a3a', '#8B7355', '#4A7C59', '#D4DDD0'];
-            const confettiCount = 100;
+            const confettiCount = 150;
+            const confettiElements = [];
 
+            // Create all confetti at once
             for (let i = 0; i < confettiCount; i++) {
-                setTimeout(() => {
-                    const confetti = document.createElement('div');
-                    confetti.className = 'confetti';
-                    confetti.style.left = Math.random() * window.innerWidth + 'px';
-                    confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-                    confetti.style.animationDuration = (Math.random() * 2 + 2) + 's';
-                    confetti.style.animationDelay = (Math.random() * 0.5) + 's';
-                    document.body.appendChild(confetti);
-
-                    // Remove confetti after animation
-                    setTimeout(() => confetti.remove(), 5000);
-                }, i * 30);
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = Math.random() * window.innerWidth + 'px';
+                confetti.style.top = '-10px';
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.animationDuration = (Math.random() * 1 + 2.5) + 's';
+                confetti.style.animationDelay = (Math.random() * 0.3) + 's';
+                document.body.appendChild(confetti);
+                confettiElements.push(confetti);
             }
+
+            // Remove all confetti after animation completes
+            setTimeout(() => {
+                confettiElements.forEach(c => c.remove());
+            }, 4000);
         }
 
         // Form submit handler
